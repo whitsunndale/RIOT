@@ -8,20 +8,20 @@
 
 char coumpute_ratio_stack[THREAD_STACKSIZE_DEFAULT];
 
-void _rising(void * args) {
+static void _rising(void * args) {
     stbm271_t * dev = (stbm271_t *) args;
     dev->ticks += (xtimer_now().ticks32 - dev->start_falling);
     gpio_init_int(OUTPUT1, GPIO_IN, GPIO_RISING, _falling, dev);
 }
 
-void _falling(void * args) {
+static void _falling(void * args) {
     stbm271_t * dev = (stbm271_t *) args;
     xtimer_ticks32_t start = xtimer_now();
     dev->start_falling = start.ticks32;
     gpio_init_int(OUTPUT1, GPIO_IN, GPIO_RISING, _rising, dev);
 }
 
-void _compute_low_ratio(void * args){
+static void _compute_low_ratio(void * args){
     stbm271_t * dev = (stbm271_t *) args;
     xtimer_ticks32_t last_wakeup = xtimer_now();
     uint32_t period = 30000000;
@@ -32,11 +32,11 @@ void _compute_low_ratio(void * args){
 }
 
 int stbm271_read_output1(stbm271_t * dev){
-
+    return dev->last_low_ratio;
 }
 
 int stbm271_read_output2(stbm271_t * dev){
-
+    return dev->last_low_ratio;
 }
 
 
