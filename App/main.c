@@ -14,11 +14,13 @@ int main(void)
     stbm271_t dev;
     stbm271_init(&dev);
 
-    do {
 
+
+    do {
         printf("Last low_ratio %d\n", low_ratio);
         xtimer_sleep(30);
-
+        low_ratio = stbm271_read_output1(&dev);
+        printf("ticks : %d\n", dev.ticks);
     } while(1);
 
     /* main thread exits */

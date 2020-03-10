@@ -12,12 +12,14 @@ static void _falling(void * args);
 
 static void _rising(void * args) {
     stbm271_t * dev = (stbm271_t *) args;
+    printf("rising\n");
     dev->ticks += (xtimer_now().ticks32 - dev->start_falling);
     gpio_init_int(OUTPUT1, GPIO_IN, GPIO_RISING, _falling, dev);
 }
 
 static void _falling(void * args) {
     stbm271_t * dev = (stbm271_t *) args;
+    printf("falling\n");
     xtimer_ticks32_t start = xtimer_now();
     dev->start_falling = start.ticks32;
     gpio_init_int(OUTPUT1, GPIO_IN, GPIO_RISING, _rising, dev);
@@ -28,7 +30,7 @@ static void * _compute_low_ratio(void * args){
     xtimer_ticks32_t last_wakeup = xtimer_now();
     uint32_t period = 30000000;
     while(1){
-        dev->last_low_ratio = ((float) xtimer_usec_from_ticks(xtimer_ticks(dev->ticks)) / period)*100 ; //TODO Change to look-up table to run faster and without fpu
+        dev->last_low_ratio = ((float) xtimer_usec_from_ticks(xtimer_ticks(dev->ticks)) / (float)period)*100 ; //TODO Change to look-up table to run faster and without fpu
         xtimer_periodic_wakeup(&last_wakeup, period);
     }
     return NULL;
@@ -57,5 +59,7 @@ void stbm271_init(stbm271_t * dev){
                     _compute_low_ratio,
                     dev, "stbm271_ratio_computer");
 
-    gpio_init_int(OUTPUT1, GPIO_IN, GPIO_FALLING, _falling, dev);
+    printf("gpio34 %d\n", OUTPUT1);
+    gpio_init(12, GPIO_IN);
+    // gpio_init_int(GPIO34, GPIO_IN_PD, GPIO_FALLING, _falling, dev);
 }
