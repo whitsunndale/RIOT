@@ -74,3 +74,5 @@ keys/
 
 # clangd language server
 .clangd/
+
+.bash_history

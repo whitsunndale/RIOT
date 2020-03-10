@@ -1,4 +1,4 @@
-#include "board.h" 
+#include "board.h"
 #include "stbm271.h"
 
 /**
@@ -6,10 +6,10 @@
  * @{
  */
 #ifndef STBM271_PARAM_GPIO1
-#define STBM271_PARAM_GPIO1        (GPIO_PIN(1,4))
+#define STBM271_PARAM_GPIO1        (GPIO34)
 #endif
 #ifndef STBM271_PARAM_GPIO2
-#define STBM271_PARAM_GPIO2       (GPIO_PIN(1,5))
+#define STBM271_PARAM_GPIO2       (GPIO35)
 #endif
 
 #ifndef STBM271_PARAMS

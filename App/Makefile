@@ -17,6 +17,8 @@ USEMODULE += periph_gpio_irq
 # Use xtimer
 USEMODULE += xtimer
 
+USEMODULE += stbm271
+
 CFLAGS += -DLOG_LEVEL=LOG_NONE  # disable log output
 
 # Change this to 0 show compiler invocation lines by default:
