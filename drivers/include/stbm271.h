@@ -1,7 +1,9 @@
 #ifndef STBM271_H
 #define STBM271_H
 
-typedef struct 
+#include "periph/gpio.h"
+
+typedef struct
 {
     gpio_t output1;
     gpio_t output2;
@@ -11,8 +13,8 @@ typedef struct {
     stbm271_params_t params;
     int offset2;
     int offset1;
-    u_int32_t ticks; // TODO this need to be protected by a mutex
-    u_int32_t start_falling;
+    uint32_t ticks; // TODO this need to be protected by a mutex
+    uint32_t start_falling;
     int last_low_ratio; // this too
 } stbm271_t;
 
