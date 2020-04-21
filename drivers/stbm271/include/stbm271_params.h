@@ -6,10 +6,10 @@
  * @{
  */
 #ifndef STBM271_PARAM_GPIO1
-#define STBM271_PARAM_GPIO1        (GPIO34)
+#define STBM271_PARAM_GPIO1        (GPIO18)
 #endif
 #ifndef STBM271_PARAM_GPIO2
-#define STBM271_PARAM_GPIO2       (GPIO35)
+#define STBM271_PARAM_GPIO2       (GPIO19)
 #endif
 
 #ifndef STBM271_PARAMS
