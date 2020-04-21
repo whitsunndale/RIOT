@@ -21,6 +21,6 @@ typedef struct {
 
 int stbm271_read_output1(stbm271_t * dev);
 int stbm271_read_output2(stbm271_t * dev);
-void stbm271_init(stbm271_t * dev);
+void stbm271_init(stbm271_t * dev, const stbm271_params_t *params);
 
 #endif // STBM271_H
