@@ -78,6 +78,7 @@
 #define NET_NANOCOAP_H
 
 #include <assert.h>
+#include <errno.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -615,6 +616,22 @@ ssize_t coap_opt_get_next(const coap_pkt_t *pkt, coap_optpos_t *opt,
 ssize_t coap_opt_get_opaque(const coap_pkt_t *pkt, unsigned opt_num, uint8_t **value);
 /**@}*/
 
+/**
+ * @brief   Convenience function for getting the packet's Proxy-Uri option
+ *
+ * @param[in]   pkt     pkt to work on
+ * @param[out]  target  pointer to the PROXY_URI in @p pkt
+ *
+ * @pre     ((pkt != NULL) && (target != NULL))
+ *
+ * @return      length of the Proxy-Uri option
+ * @return      -ENOENT if Proxy-Uri option not found
+ * @return      -EINVAL if Proxy-Uri option cannot be parsed
+ */
+static inline ssize_t coap_get_proxy_uri(const coap_pkt_t *pkt, char **target)
+{
+    return coap_opt_get_opaque(pkt, COAP_OPT_PROXY_URI, (uint8_t **)target);
+}
 
 /**
  * @name    Functions -- Options for Block
@@ -1047,6 +1064,27 @@ static inline ssize_t coap_opt_add_uri_query(coap_pkt_t *pkt, const char *key,
 ssize_t coap_opt_add_proxy_uri(coap_pkt_t *pkt, const char *uri);
 
 /**
+ * @brief   Encode the given array of characters as option(s) into pkt
+ *
+ * Use separator to split array of characters into multiple options.
+ *
+ * @post pkt.payload advanced to first byte after option(s)
+ * @post pkt.payload_len reduced by option(s) length
+ *
+ * @param[in,out] pkt         pkt referencing target buffer
+ * @param[in]     optnum      option number to use
+ * @param[in]     chars       array of characters to encode as option
+ * @param[in]     chars_len   length of @p chars
+ * @param[in]     separator   character used in @p string to separate parts
+ *
+ * @return        number of bytes written to buffer
+ * @return        <0 on error
+ * @return        -ENOSPC if no available options or insufficient buffer space
+ */
+ssize_t coap_opt_add_chars(coap_pkt_t *pkt, uint16_t optnum, const char *chars,
+                           size_t chars_len, char separator);
+
+/**
  * @brief   Encode the given string as option(s) into pkt
  *
  * Use separator to split string into multiple options.
@@ -1063,7 +1101,11 @@ ssize_t coap_opt_add_proxy_uri(coap_pkt_t *pkt, const char *uri);
  * @return        <0 on error
  * @return        -ENOSPC if no available options or insufficient buffer space
  */
-ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum, const char *string, char separator);
+static inline ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum,
+                                          const char *string, char separator)
+{
+    return coap_opt_add_chars(pkt, optnum, string, strlen(string), separator);
+}
 
 /**
  * @brief   Adds one or multiple Uri-Path options in the form '/path' into pkt
@@ -1539,6 +1581,63 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len);
  * @param[in]    header_len length of header in buf, including token
  */
 void coap_pkt_init(coap_pkt_t *pkt, uint8_t *buf, size_t len, size_t header_len);
+
+/**
+ * @brief   Advance the payload pointer.
+ *
+ * @pre     You added @p len bytes of data to `pkt->payload`.
+ *
+ * You can add payload to a CoAP request by writing data directly to
+ * `pkt->payload`.
+ * This convenience function takes care of advancing the payload pointer
+ * afterwards.
+ *
+ * @param[out]   pkt        pkt to which payload was added
+ * @param[in]    len        length of payload
+ */
+static inline void coap_payload_advance_bytes(coap_pkt_t *pkt, size_t len)
+{
+    pkt->payload += len;
+    pkt->payload_len -= len;
+}
+
+/**
+ * @brief   Add payload data to the CoAP request.
+ *
+ * @pre     @ref coap_opt_finish must have been called before with
+ *               the @ref COAP_OPT_FINISH_PAYLOAD option.
+ *
+ * The function copies @p data into the payload buffer of @p pkt and
+ * advances the payload pointer.
+ *
+ * This is just a convenience function, you can also directly write
+ * to `pkt->payload` if you have a function that outputs payload to
+ * a buffer.
+ * In this case you should instead call @ref coap_payload_advance_bytes.
+ *
+ * @param[out]   pkt        pkt to add payload to
+ * @param[in]    data       payload data
+ * @param[in]    len        length of payload
+ *
+ * @returns      number of payload bytes added on success
+ * @returns      < 0 on error
+ */
+ssize_t coap_payload_put_bytes(coap_pkt_t *pkt, const void *data, size_t len);
+
+/**
+ * @brief Add a single character to the payload data of the CoAP request
+ *
+ * This function is used to add single characters to a CoAP payload data. It
+ * checks whether the character can be added to the buffer and ignores if the
+ * payload area is already exhausted.
+ *
+ * @param[out]   pkt        pkt to add payload to
+ * @param[in]    c          character to write
+ *
+ * @returns      number of payload bytes added on success (always one)
+ * @returns      < 0 on error
+ */
+ssize_t coap_payload_put_char(coap_pkt_t *pkt, char c);
 
 /**
  * @brief   Create CoAP reply (convenience function)

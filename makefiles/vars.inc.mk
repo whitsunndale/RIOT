@@ -29,7 +29,9 @@ export APPDEPS               # Files / Makefile targets that need to be created 
 export RIOTBASE              # The root folder of RIOT. The folder where this very file lives in.
 export RIOTCPU               # For third party CPUs this folder is the base of the CPUs.
 export RIOTBOARD             # This folder is the base of the riot boards.
-export BOARDSDIR             # For third party BOARDs this folder is the base of the BOARDs.
+export BOARDSDIR             # This is the folder containing the board dir
+export EXTERNAL_BOARD_DIRS   # List of folders containing external board dirs
+export BOARDDIR              # This folder contains the board
 export RIOTPKG               # For overriding RIOT's pkg directory
 export RIOTTOOLS             # Location of host machine tools
 export RIOTPROJECT           # Top level git root of the project being built, or PWD if not a git repository
@@ -76,6 +78,7 @@ export SIZEFLAGS             # The optional size flags.
 export UNDEF                 # Object files that the linker must include in the ELFFILE even if no call to the functions or symbols (ex: interrupt vectors).
 export WERROR                # Treat all compiler warnings as errors if set to 1 (see -Werror flag in GCC manual)
 export WPEDANTIC             # Issue all (extensive) compiler warnings demanded by strict C/C++
+# EEPROM_FILE                # (Native only!) file path where the content of the EEPROM is stored
 
 export GITCACHE              # path to git-cache executable
 export GIT_CACHE_DIR         # path to git-cache cache directory
