@@ -11,12 +11,14 @@ static void _falling(void * args);
 
 static void _rising(void * args) {
     stbm271_t * dev = (stbm271_t *) args;
+    gpio_set(GPIO16);
     dev->ticks += (xtimer_now().ticks32 - dev->start_falling);
     gpio_init_int(OUTPUT1, GPIO_IN, GPIO_FALLING, _falling, dev);
 }
 
 static void _falling(void * args) {
     stbm271_t * dev = (stbm271_t *) args;
+    gpio_clear(GPIO16);
     xtimer_ticks32_t start = xtimer_now();
     dev->start_falling = start.ticks32;
     gpio_init_int(OUTPUT1, GPIO_IN, GPIO_RISING, _rising, dev);
@@ -47,6 +49,7 @@ int stbm271_read_output1(stbm271_t * dev){
 
 void stbm271_init(stbm271_t * dev, const stbm271_params_t *params){
     xtimer_init();
+    gpio_init(GPIO16, GPIO_OUT);
     dev->params = *params;
     dev->ticks = 0;
     dev->start_falling=0;
